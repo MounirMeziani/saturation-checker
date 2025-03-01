@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Grayscale Toggle Extension",
+  "version": "1.0",
+  "description": "Toggle grayscale filter on any website via a popup slider.",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Grayscale Filter"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+} 
