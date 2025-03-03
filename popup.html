@@ -7,14 +7,36 @@
     body {
       font-family: Arial, sans-serif;
       padding: 10px;
-      min-width: 200px;
+      min-width: 250px;
     }
     .container {
       margin-bottom: 10px;
     }
+    .section-title {
+      font-weight: bold;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+    .hidden {
+      display: none;
+    }
+    #customWebsiteContainer {
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid #ccc;
+    }
+    #websiteInput {
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+    }
   </style>
 </head>
 <body>
+  <div class="section-title">Global Settings</div>
   <div class="container">
     <label>
       <input type="checkbox" id="toggleFilter" />
@@ -26,8 +48,36 @@
     <input type="range" id="intensity" min="0" max="100" value="100" />
   </div>
   <div class="container">
-    <button id="saveSettings">Save Settings</button>
+    <button id="saveSettings">Save Global Settings</button>
   </div>
+  
+  <div class="section-title">Website-Specific Settings</div>
+  <div id="currentWebsiteInfo" class="container">
+    Current website: <span id="currentDomain">-</span>
+    <span id="customStatus"></span>
+  </div>
+  
+  <div id="customWebsiteSection" class="container">
+    <button id="addCustomWebsite">Set Custom Greyscale for This Website</button>
+    
+    <div id="customWebsiteContainer" class="hidden">
+      <div class="container">
+        <label>
+          <input type="checkbox" id="customToggleFilter" />
+          Enable Custom Grayscale
+        </label>
+      </div>
+      <div class="container">
+        <label for="customIntensity">Custom Intensity: <span id="customIntensityValue">100</span>%</label>
+        <input type="range" id="customIntensity" min="0" max="100" value="100" />
+      </div>
+      <div class="container button-row">
+        <button id="saveCustomSettings">Save Custom Settings</button>
+        <button id="removeCustomSettings" class="hidden">Remove Custom Settings</button>
+      </div>
+    </div>
+  </div>
+  
   <script src="popup.js"></script>
 </body>
 </html> 

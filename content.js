@@ -1,5 +1,6 @@
 // Global variables to track state
 let lastFullscreenElement = null;
+let currentDomain = window.location.hostname;
 
 // Cross-browser function to get the current fullscreen element
 function getFullscreenElement() {
@@ -24,6 +25,7 @@ if (!styleElement) {
 // Initialize the filter state
 let isEnabled = false;
 let intensity = 100;
+let customWebsites = {}; // Store custom website settings
 
 // Function to update the grayscale filter
 function updateFilter() {
@@ -55,13 +57,49 @@ function updateFilter() {
   }
 }
 
+// Load saved settings when the content script initializes
+chrome.storage.sync.get({
+  grayscaleSettings: {
+    enabled: false,
+    intensity: 100
+  },
+  customWebsites: {}
+}, function(result) {
+  customWebsites = result.customWebsites;
+  
+  // Check if current website has custom settings
+  if (customWebsites[currentDomain]) {
+    isEnabled = customWebsites[currentDomain].enabled;
+    intensity = customWebsites[currentDomain].intensity;
+  } else {
+    isEnabled = result.grayscaleSettings.enabled;
+    intensity = result.grayscaleSettings.intensity;
+  }
+  
+  updateFilter();
+});
+
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   if (message.type === 'updateFilter') {
     isEnabled = message.enabled;
     intensity = message.intensity;
     updateFilter();
+    
+    // If this is a site-specific update, store it
+    if (message.siteSpecific) {
+      // Nothing to do here, the popup will handle saving to storage
+    }
+  } else if (message.type === 'getStatus') {
+    // Send back the current domain and settings
+    sendResponse({
+      domain: currentDomain,
+      isCustom: !!customWebsites[currentDomain],
+      enabled: isEnabled,
+      intensity: intensity
+    });
   }
+  return true; // Keep the message channel open for async responses
 });
 
 // Handle fullscreen state changes
@@ -86,16 +124,4 @@ function handleFullscreenChange() {
 document.addEventListener('fullscreenchange', handleFullscreenChange);
 document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-
-// Load saved settings when the content script initializes
-chrome.storage.sync.get({
-  grayscaleSettings: {
-    enabled: false,
-    intensity: 100
-  }
-}, function(result) {
-  isEnabled = result.grayscaleSettings.enabled;
-  intensity = result.grayscaleSettings.intensity;
-  updateFilter();
-}); 
+document.addEventListener('MSFullscreenChange', handleFullscreenChange); 
